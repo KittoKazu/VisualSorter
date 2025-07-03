@@ -65,8 +65,8 @@ class MainApp : Application() {
 Checks whether the string only contains usable characters. Returns True or False
  */
 fun CheckIfUsable(input: String): Boolean {
-    val filter = Regex("^[\\d,\\s]*$") //regex expression filters out d(digits), commas and s(whitespaces)
-    return input.matches(filter)
+    val Filter = Regex("^[\\d,\\s]*$") //regex expression filters out d(digits), commas and s(whitespaces)
+    return input.matches(Filter)
 }
 
 /*
@@ -75,6 +75,6 @@ Converts a string into a list, ignoring spaces.
 fun ConvertToList(input:String): List<Int> {
     return input
         .split(",") //Filters values seperated by comma
-        .map {it.trim()}.map{it.isNotEmpty()} //Filters out spaces before and after values
+        .map {it.trim()}.filter{it.isNotEmpty()} //Filters out spaces before and after values
         .map {it.toInt()} //Turns the values to Int
 }
