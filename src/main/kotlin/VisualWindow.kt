@@ -6,7 +6,8 @@ import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
-import javafx.scene.control.CheckBox
+import javafx.scene.control.RadioButton
+import javafx.scene.control.ToggleGroup
 import javafx.scene.control.TextField
 import javafx.geometry.Insets
 
@@ -22,28 +23,57 @@ class MainApp : Application() {
     }
 
     val inputField = TextField()
-    val toggleQuickSort = CheckBox("Quick sort")
-    val toggleBubbleSort = CheckBox("Bubble sort")
+    val algGroup = ToggleGroup()
     val buttonPressed = Label("")
+    val algContainer = javafx.scene.layout.HBox(10.0)
+    val chartHeight = 300.0
+
+    val toggleQuickSort = RadioButton("Quick sort").apply {
+        toggleGroup = algGroup
+    }
+
+    val toggleBubbleSort = RadioButton("Bubble sort").apply {
+        toggleGroup = algGroup
+    }
 
     override fun start(stage: Stage) {
 
         val titleLabel = Label("Welcome to the Visual Sorter")
 
-        inputField.promptText = "Give values, separate with , ."  // hint text inside input
-        inputField.maxWidth = 300.0  // optional: limit width so it looks nice
+        inputField.promptText = "Give values, separate with , ."  // Text inside input field
+        inputField.maxWidth = 300.0  // limit width so it looks nice
 
         val startButton = Button("Start")
         startButton.setOnAction {
-            val inputText = inputField.text.ifBlank { "(empty)" }
+            algContainer.children.clear() //Clears the visual graph before doing anything else.
 
-            val selectedOptions = mutableListOf<String>()
-            if (toggleQuickSort.isSelected) selectedOptions.add(toggleQuickSort.text)
-            if (toggleBubbleSort.isSelected) selectedOptions.add(toggleBubbleSort.text)
+            val inputText = inputField.text.ifBlank { "" }
 
-            val options = if (selectedOptions.isEmpty()) "None" else selectedOptions.joinToString(", ")
+            if (CheckIfUsable(inputText)) {
+                val inputArray = ConvertToList(inputText)
 
-            buttonPressed.text = "Input: $inputText   Selected: $options"
+                val maxVal = inputArray.maxOrNull() ?: 1 // Get the highest value, to scale the bars
+                val bars = inputArray.map { value ->
+                    val height = (value.toDouble() / maxVal * chartHeight).coerceAtLeast(1.0) // Scales the entire chart
+                    javafx.scene.shape.Rectangle(10.0, height).apply {
+                        fill = javafx.scene.paint.Color.DARKSEAGREEN //create and color the bars
+                    }
+                }.toMutableList()
+
+                algContainer.children.addAll(bars)
+
+                if (toggleBubbleSort.isSelected) {
+                Thread {
+                    bubbleSortVisual(inputArray.toIntArray(), bars)
+                }.start()
+                }
+                if (toggleQuickSort.isSelected) {
+                    Thread {
+                        quickSortVisual(inputArray.toIntArray(), bars)
+                    }.start()
+                }
+            }
+            buttonPressed.text = "Input: $inputText"
         }
 
         val root = VBox(10.0,
@@ -52,7 +82,8 @@ class MainApp : Application() {
             toggleBubbleSort,
             inputField,
             startButton,
-            buttonPressed
+            buttonPressed,
+            algContainer,
         )
         root.padding = Insets(20.0)
 
