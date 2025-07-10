@@ -37,6 +37,7 @@ class MainApp : Application() {
         val startButton = Button("Start")
         startButton.setOnAction { //activates when startButton is pressed
             algContainer.children.clear() //Clears the graph container before doing anything else in order to prevent bugs.
+            dotContainer.children.clear()
 
             val inputText = inputField.text.ifBlank { "" }
 
