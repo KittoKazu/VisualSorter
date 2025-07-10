@@ -1,6 +1,7 @@
 package nl.kittokazu
 
 import javafx.application.Application
+import javafx.application.Platform
 import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.control.Label
@@ -10,6 +11,8 @@ import javafx.scene.control.RadioButton
 import javafx.scene.control.ToggleGroup
 import javafx.scene.control.TextField
 import javafx.geometry.Insets
+import javafx.scene.paint.Color
+import javafx.scene.shape.Rectangle
 
 class MainApp : Application() {
 
@@ -46,8 +49,8 @@ class MainApp : Application() {
                 val maxVal = inputArray.maxOrNull() ?: 1 // Get the highest value, to scale the bars
                 val bars = inputArray.map { value ->
                     val height = (value.toDouble() / maxVal * chartHeight).coerceAtLeast(1.0) // Scales the entire chart
-                    javafx.scene.shape.Rectangle(10.0, chartHeight - height).apply {
-                        fill = javafx.scene.paint.Color.DARKSEAGREEN //create and color the bars
+                    Rectangle(10.0, height).apply {
+                        fill = Color.DARKSEAGREEN //create and color the bars
                     }
                 }.toMutableList()
 
@@ -55,12 +58,40 @@ class MainApp : Application() {
 
                 if (toggleBubbleSort.isSelected) {
                     Thread {
-                        bubbleSortVisual(inputArray.toIntArray(), bars)
+                        BubbleSort().sort(inputArray.toIntArray()) { values, i, j ->
+                            Platform.runLater {
+                                val tempHeight = bars[i].height
+                                bars[i].height = bars[j].height
+                                bars[j].height = tempHeight
+
+                                bars[i].fill = Color.ORANGE
+                                bars[j].fill = Color.ORANGE
+                            }
+                            Thread.sleep(speedTime)
+                            Platform.runLater {
+                                bars[i].fill = Color.DARKSEAGREEN
+                                bars[j].fill = Color.DARKSEAGREEN
+                            }
+                        }
                     }.start()
                 }
                 if (toggleQuickSort.isSelected) {
                     Thread {
-                        quickSortVisual(inputArray.toIntArray(), bars)
+                        QuickSort().sort(inputArray.toIntArray()) { values, i, j ->
+                            Platform.runLater {
+                                val tempHeight = bars[i].height
+                                bars[i].height = bars[j].height
+                                bars[j].height = tempHeight
+
+                                bars[i].fill = Color.ORANGE
+                                bars[j].fill = Color.ORANGE
+                            }
+                            Thread.sleep(speedTime)
+                            Platform.runLater {
+                                bars[i].fill = Color.DARKSEAGREEN
+                                bars[j].fill = Color.DARKSEAGREEN
+                            }
+                        }
                     }.start()
                 }
             }
