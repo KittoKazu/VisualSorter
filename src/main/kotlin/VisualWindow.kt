@@ -13,15 +13,6 @@ import javafx.geometry.Insets
 
 class MainApp : Application() {
 
-    companion object {
-        lateinit var instance: MainApp
-            private set
-    }
-
-    init {
-        instance = this
-    }
-
     val inputField = TextField()
     val algGroup = ToggleGroup()
     val buttonPressed = Label("")
@@ -55,7 +46,7 @@ class MainApp : Application() {
                 val maxVal = inputArray.maxOrNull() ?: 1 // Get the highest value, to scale the bars
                 val bars = inputArray.map { value ->
                     val height = (value.toDouble() / maxVal * chartHeight).coerceAtLeast(1.0) // Scales the entire chart
-                    javafx.scene.shape.Rectangle(10.0, height).apply {
+                    javafx.scene.shape.Rectangle(10.0, chartHeight - height).apply {
                         fill = javafx.scene.paint.Color.DARKSEAGREEN //create and color the bars
                     }
                 }.toMutableList()
@@ -63,9 +54,9 @@ class MainApp : Application() {
                 algContainer.children.addAll(bars)
 
                 if (toggleBubbleSort.isSelected) {
-                Thread {
-                    bubbleSortVisual(inputArray.toIntArray(), bars)
-                }.start()
+                    Thread {
+                        bubbleSortVisual(inputArray.toIntArray(), bars)
+                    }.start()
                 }
                 if (toggleQuickSort.isSelected) {
                     Thread {
