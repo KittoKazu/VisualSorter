@@ -16,8 +16,9 @@ class MainApp : Application() {
     val inputField = TextField()
     val algGroup = ToggleGroup()
     val buttonPressed = Label("")
-    val algContainer = javafx.scene.layout.HBox(10.0)
-    val chartHeight = 300.0
+    val algContainer = javafx.scene.layout.Pane()
+    val dotContainer = javafx.scene.layout.Pane()
+    val chartHeight = 200.0
 
     val toggleQuickSort = RadioButton("Quick sort").apply {
         toggleGroup = algGroup
@@ -45,10 +46,14 @@ class MainApp : Application() {
                 val visualGraph = GraphVisualizer() //Creates a graph instance to show the algorithm
                 visualGraph.initGraph(inputArray.toIntArray(),chartHeight,algContainer) //initializes the graph
 
+                val visualDots = DotVisualizer() //Creates a class for showing the dots
+                visualDots.initDots(inputArray.toIntArray(),chartHeight,dotContainer)
+
                 if (toggleBubbleSort.isSelected) {
                     Thread {
                         BubbleSort().sort(inputArray.toIntArray()) { values, i, j ->
                             visualGraph.trackAlgorithm(i, j) //Tracks the changes in the graph and changes color when checking
+                            visualDots.trackAlgorithm(i, j)
                         }
                     }.start()
                 }
@@ -56,6 +61,7 @@ class MainApp : Application() {
                     Thread {
                         QuickSort().sort(inputArray.toIntArray()) { values, i, j ->
                             visualGraph.trackAlgorithm(i, j)
+                            visualDots.trackAlgorithm(i, j)
                         }
                     }.start()
                 }
@@ -73,11 +79,12 @@ class MainApp : Application() {
             startButton,
             buttonPressed,
             algContainer,
+            dotContainer
         ) // Puts all units inside a visual box to display
         sorterBox.padding = Insets(20.0) //Creates an empty border around the visual box
 
         stage.title = "VisualSorter ver. 1.0.0" //Sets the title at the top of the window
-        stage.scene = Scene(sorterBox,800.0, 600.0) //Sets the default size of the window
+        stage.scene = Scene(sorterBox,650.0, 800.0) //Sets the default size of the window
         stage.show()
     }
 }
@@ -85,8 +92,8 @@ class MainApp : Application() {
 Checks whether the string only contains usable characters. Returns True or False
  */
 fun CheckIfUsable(input: String): Boolean {
-    val Filter = Regex("^[\\d,\\s]*$") //regex expression filters out d(digits), commas and s(whitespaces)
-    return input.matches(Filter)
+    val filter = Regex("^[\\d,\\s]*$") //regex expression filters out d(digits), commas and s(whitespaces)
+    return input.matches(filter)
 }
 
 /*
