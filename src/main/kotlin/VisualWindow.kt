@@ -1,6 +1,7 @@
 package nl.kittokazu
 
 import javafx.application.Application
+import javafx.application.Platform
 import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.control.Label
@@ -13,74 +14,94 @@ import javafx.geometry.Insets
 
 class MainApp : Application() {
 
-    val inputField = TextField()
-    val algGroup = ToggleGroup()
-    val buttonPressed = Label("")
-    val algContainer = javafx.scene.layout.Pane()
-    val dotContainer = javafx.scene.layout.Pane()
-    val chartHeight = 200.0
+    val inputField = TextField() // Text field for entering values
+    val textFieldWidth = 300.0 //Max width of text field, for easy changing
 
-    val toggleQuickSort = RadioButton("Quick sort").apply {
-        toggleGroup = algGroup
-    }
-    val toggleBubbleSort = RadioButton("Bubble sort").apply {
-        toggleGroup = algGroup
-    }
+    val inputFeedback = Label("") //Label used to show user their own input, or to show wrong input
+    val algRadioLabel = Label("Choose your algorithm")
+    val visRadioLabel = Label("Choose your visualization")
+    val clearLine = Label(" ") //Empty label to use as an empty line
+
+    val chartHeight = 200.0 //Height of visual containers, for easy changing
+    val container = javafx.scene.layout.Pane() //Container for visualisations
+
+    val algToggleGroup = ToggleGroup() // Toggle groups for Radio buttons
+    val visToggleGroup = ToggleGroup()
+
+    val toggleQuickSort = MakeRadioButton("Quick sort", algToggleGroup) // Creating Radio buttons with a class
+    val toggleBubbleSort = MakeRadioButton("Bubble sort",algToggleGroup)
+    val toggleGraphVisualizer = MakeRadioButton("Graph visualizer", visToggleGroup)
+    val toggleDotVisualizer = MakeRadioButton("Dot visualizer", visToggleGroup)
+
+    val visualGraph = GraphVisualizer()//Creates an object to visualise with a graph
+    val visualDots = DotVisualizer() //Creates an object to visualise with dots
 
     override fun start(stage: Stage) {
 
         val titleLabel = Label("Welcome to the Visual Sorter")
 
         inputField.promptText = "Give values, separate with , ."  // Text inside input field
-        inputField.maxWidth = 300.0  // Limits text field width
+        inputField.maxWidth = textFieldWidth  // Limits text field width
+
+        var graphChosen = false //Booleans for choosing visualisation type, makes sure updateVisuals cannot change target while algorithm is running
+        var dotChosen = false
 
         val startButton = Button("Start")
         startButton.setOnAction { //activates when startButton is pressed
-            algContainer.children.clear() //Clears the graph container before doing anything else in order to prevent bugs.
-            dotContainer.children.clear()
+            startButton.isDisable = true //Disables startButton so user cannot start multiple sorting instances simultaneously
+            container.children.clear() //Clears the container in order to prevent visual bugs
 
-            val inputText = inputField.text.ifBlank { "" }
+            graphChosen = false //Resets visualisation choices to prevent bugs
+            dotChosen = false
 
-            if (CheckIfUsable(inputText)) {
-                val inputArray = ConvertToList(inputText)
+            val inputText = inputField.text.ifBlank { "ERROR" }
 
-                val visualGraph = GraphVisualizer() //Creates a graph instance to show the algorithm
-                visualGraph.initGraph(inputArray.toIntArray(),chartHeight,algContainer) //initializes the graph
+            if (checkIfUsable(inputText)) { //Checks if input can be used
+                inputFeedback.text = "Input: $inputText" //Prints user input
 
-                val visualDots = DotVisualizer() //Creates a class for showing the dots
-                visualDots.initDots(inputArray.toIntArray(),chartHeight,dotContainer)
+                val inputArray = convertToList(inputText) //Turns input into list<Int>
 
-                if (toggleBubbleSort.isSelected) {
+                if (toggleGraphVisualizer.radioButton.isSelected) {
+                    visualGraph.initGraph(inputArray.toIntArray(), chartHeight, container) //Initializes the visualisation
+                    graphChosen = true
+                }
+                if (toggleDotVisualizer.radioButton.isSelected) {
+                    visualDots.initDots(inputArray.toIntArray(), chartHeight, container)
+                    dotChosen = true
+                }
+
+                if (toggleBubbleSort.radioButton.isSelected) {
                     Thread {
-                        BubbleSort().sort(inputArray.toIntArray()) { values, i, j ->
-                            visualGraph.trackAlgorithm(i, j) //Tracks the changes in the graph and changes color when checking
-                            visualDots.trackAlgorithm(i, j)
-                        }
+                        BubbleSort().sort(inputArray.toIntArray()) { values, i, j -> updateVisuals(i,j,graphChosen,dotChosen) } // Start sorting and update visualisation
+                        Platform.runLater { startButton.isDisable = false } //Enables button after algorithm is done.
                     }.start()
                 }
-                if (toggleQuickSort.isSelected) {
+                if (toggleQuickSort.radioButton.isSelected) {
                     Thread {
-                        QuickSort().sort(inputArray.toIntArray()) { values, i, j ->
-                            visualGraph.trackAlgorithm(i, j)
-                            visualDots.trackAlgorithm(i, j)
-                        }
+                        QuickSort().sort(inputArray.toIntArray()) { values, i, j -> updateVisuals(i,j,graphChosen,dotChosen) }
+                        Platform.runLater { startButton.isDisable = false }
                     }.start()
                 }
             }
-            buttonPressed.text = "Input: $inputText"
+            else{
+                inputFeedback.text = "Please make sure input only contains numbers and comma's (,)"
+                startButton.isDisable = false //Enables button so user can submit new input
+            }
         }
 
         val sorterBox = VBox(10.0,
-
             titleLabel,
-            toggleQuickSort,
-
-            toggleBubbleSort,
+            clearLine,
+            algRadioLabel,
+            toggleQuickSort.radioButton,
+            toggleBubbleSort.radioButton,
+            visRadioLabel,
+            toggleGraphVisualizer.radioButton,
+            toggleDotVisualizer.radioButton,
             inputField,
             startButton,
-            buttonPressed,
-            algContainer,
-            dotContainer
+            inputFeedback,
+            container
         ) // Puts all units inside a visual box to display
         sorterBox.padding = Insets(20.0) //Creates an empty border around the visual box
 
@@ -88,22 +109,24 @@ class MainApp : Application() {
         stage.scene = Scene(sorterBox,650.0, 800.0) //Sets the default size of the window
         stage.show()
     }
-}
-/*
-Checks whether the string only contains usable characters. Returns True or False
- */
-fun CheckIfUsable(input: String): Boolean {
-    val filter = Regex("^[\\d,\\s]*$") //regex expression filters out d(digits), commas and s(whitespaces)
-    return input.matches(filter)
-}
-
-/*
-Converts a string into a list, ignoring spaces.
- */
-fun ConvertToList(input:String): List<Int> {
-    return input
-        .split(",") //Filters values seperated by comma
-        .map {it.trim()}.filter{it.isNotEmpty()} //Filters out spaces before and after values
-        .map {it.toInt()} //Turns the values to Int
+    /*
+    Chooses correct algorithm to track and updates visualisation
+     */
+    fun updateVisuals(i: Int, j: Int, graphChosen:Boolean, dotChosen:Boolean) {
+        if (graphChosen) {
+            visualGraph.trackAlgorithm(i, j)
+        }
+        if (dotChosen) {
+            visualDots.trackAlgorithm(i, j)
+        }
+    }
 }
 
+/*
+Class to create a radio button with custom label and ToggleGroup
+ */
+class MakeRadioButton(label: String, group: ToggleGroup){
+    val radioButton= RadioButton(label).apply{
+        toggleGroup = group
+    }
+}

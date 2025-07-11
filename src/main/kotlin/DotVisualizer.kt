@@ -13,7 +13,7 @@ class DotVisualizer {
 
         circles = values.mapIndexed { index, value ->
             val x = index * 20.0 + 15.0  // spacing between bubbles
-            val y = (value.toDouble() / maxVal * chartHeight)
+            val y = chartHeight - (value.toDouble() / maxVal * chartHeight)
 
             Circle(10.0).apply {
                 centerX = x
