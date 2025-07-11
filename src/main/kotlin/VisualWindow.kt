@@ -14,8 +14,8 @@ import javafx.geometry.Insets
 
 class MainApp : Application() {
 
-    val inputField = TextField() // Text field for entering values
     val textFieldWidth = 300.0 //Max width of text field, for easy changing
+    val inputField = TextField() // Text field for entering values
 
     val inputFeedback = Label("") //Label used to show user their own input, or to show wrong input
     val algRadioLabel = Label("Choose your algorithm")
@@ -62,11 +62,11 @@ class MainApp : Application() {
                 val inputArray = convertToList(inputText) //Turns input into list<Int>
 
                 if (toggleGraphVisualizer.radioButton.isSelected) {
-                    visualGraph.initGraph(inputArray.toIntArray(), chartHeight, container) //Initializes the visualisation
+                    visualGraph.init(inputArray.toIntArray(), chartHeight, container) //Initializes the visualisation
                     graphChosen = true
                 }
                 if (toggleDotVisualizer.radioButton.isSelected) {
-                    visualDots.initDots(inputArray.toIntArray(), chartHeight, container)
+                    visualDots.init(inputArray.toIntArray(), chartHeight, container)
                     dotChosen = true
                 }
 
@@ -114,10 +114,10 @@ class MainApp : Application() {
      */
     fun updateVisuals(i: Int, j: Int, graphChosen:Boolean, dotChosen:Boolean) {
         if (graphChosen) {
-            visualGraph.trackAlgorithm(i, j)
+            visualGraph.track(i, j)
         }
         if (dotChosen) {
-            visualDots.trackAlgorithm(i, j)
+            visualDots.track(i, j)
         }
     }
 }
