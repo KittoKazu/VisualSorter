@@ -47,6 +47,30 @@ class MainApp : Application() {
         var dotChosen: Boolean
 
         val startButton = Button("Start")
+
+        toggleQuickSort.radioButton.isSelected = true //Pre-selects one of the radio buttons for each group
+        toggleGraphVisualizer.radioButton.isSelected = true
+
+        val sorterBox = VBox(10.0,
+            titleLabel,
+            clearLine,
+            algRadioLabel,
+            toggleQuickSort.radioButton,
+            toggleBubbleSort.radioButton,
+            visRadioLabel,
+            toggleGraphVisualizer.radioButton,
+            toggleDotVisualizer.radioButton,
+            inputField,
+            startButton,
+            inputFeedback,
+            container
+        ) // Puts all units inside a visual box to display
+
+        sorterBox.padding = Insets(20.0) //Creates an empty border around the visual box
+        stage.title = "VisualSorter ver. 1.0.0" //Sets the title at the top of the window
+        stage.scene = Scene(sorterBox,650.0, 800.0) //Sets the default size of the window
+        stage.show()
+
         startButton.setOnAction { //activates when startButton is pressed
             startButton.isDisable = true //Disables startButton so user cannot start multiple sorting instances simultaneously
             container.children.clear() //Clears the container in order to prevent visual bugs
@@ -88,29 +112,6 @@ class MainApp : Application() {
                 startButton.isDisable = false //Enables button so user can submit new input
             }
         }
-
-        toggleQuickSort.radioButton.isSelected = true //Pre-selects one of the radio buttons for each group
-        toggleGraphVisualizer.radioButton.isSelected = true
-
-        val sorterBox = VBox(10.0,
-            titleLabel,
-            clearLine,
-            algRadioLabel,
-            toggleQuickSort.radioButton,
-            toggleBubbleSort.radioButton,
-            visRadioLabel,
-            toggleGraphVisualizer.radioButton,
-            toggleDotVisualizer.radioButton,
-            inputField,
-            startButton,
-            inputFeedback,
-            container
-        ) // Puts all units inside a visual box to display
-
-        sorterBox.padding = Insets(20.0) //Creates an empty border around the visual box
-        stage.title = "VisualSorter ver. 1.0.0" //Sets the title at the top of the window
-        stage.scene = Scene(sorterBox,650.0, 800.0) //Sets the default size of the window
-        stage.show()
     }
     /*
     Chooses correct algorithm to track and updates visualisation
