@@ -43,8 +43,8 @@ class MainApp : Application() {
         inputField.promptText = "Give values, separate with , ."  // Text inside input field
         inputField.maxWidth = textFieldWidth  // Limits text field width
 
-        var graphChosen = false //Booleans for choosing visualisation type, makes sure updateVisuals cannot change target while algorithm is running
-        var dotChosen = false
+        var graphChosen: Boolean //Booleans for choosing visualisation type, makes sure updateVisuals cannot change target while algorithm is running
+        var dotChosen: Boolean
 
         val startButton = Button("Start")
         startButton.setOnAction { //activates when startButton is pressed
@@ -54,7 +54,7 @@ class MainApp : Application() {
             graphChosen = false //Resets visualisation choices to prevent bugs
             dotChosen = false
 
-            val inputText = inputField.text.ifBlank { "ERROR" }
+            val inputText = inputField.text
 
             if (checkIfUsable(inputText)) { //Checks if input can be used
                 inputFeedback.text = "Input: $inputText" //Prints user input
@@ -89,6 +89,9 @@ class MainApp : Application() {
             }
         }
 
+        toggleQuickSort.radioButton.isSelected = true //Pre-selects one of the radio buttons for each group
+        toggleGraphVisualizer.radioButton.isSelected = true
+
         val sorterBox = VBox(10.0,
             titleLabel,
             clearLine,
@@ -103,8 +106,8 @@ class MainApp : Application() {
             inputFeedback,
             container
         ) // Puts all units inside a visual box to display
-        sorterBox.padding = Insets(20.0) //Creates an empty border around the visual box
 
+        sorterBox.padding = Insets(20.0) //Creates an empty border around the visual box
         stage.title = "VisualSorter ver. 1.0.0" //Sets the title at the top of the window
         stage.scene = Scene(sorterBox,650.0, 800.0) //Sets the default size of the window
         stage.show()

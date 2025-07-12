@@ -1,6 +1,7 @@
 package nl.kittokazu
 
 class BubbleSort : Sorter {
+
     /*
     Sorts an array using bubble sort
      */
