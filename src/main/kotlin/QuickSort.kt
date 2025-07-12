@@ -18,7 +18,7 @@ Divides an array into partitions, recursively
         onUpdate: (arr: IntArray, i: Int, j: Int) -> Unit
     ) {
         if (low < high) {
-            val pivotIndex = partition(values, low, high, onUpdate) //Calls for partition to be sorted
+            val pivotIndex = partition(values, low, high, onUpdate) //Calls for partition to sort around pivot
             quickSortRecursive(values, low, pivotIndex - 1, onUpdate) //Calls itself left of pivot
             quickSortRecursive(values, pivotIndex + 1, high, onUpdate) //Calls itself right of pivot
         }
@@ -39,7 +39,7 @@ Divides an array into partitions, recursively
         for (j in low until high) {
             if (values[j] <= pivot) {
                 i++
-                values.swap(i, j) //Sorts the partition by swapping values
+                values.swap(i, j) //Puts values lower than pivot on the left
                 onUpdate(values, i, j)  // Notifies visualisation
             }
         }
