@@ -11,7 +11,7 @@ class QuickSortTest : TestSorter() {
         val toSort = basicTestingList.copyOf() //copyOf so original array cannot be touched
         toSort.shuffle()
         QuickSort().sort(toSort)
-        assertContentEquals(basicTestingList, toSort)
+        assertContentEquals(basicTestingList, toSort, "quickSort does not correctly sort array")
     }
 
     /*
@@ -22,7 +22,7 @@ class QuickSortTest : TestSorter() {
         val toSort = longTestingList.copyOf()
         toSort.shuffle()
         QuickSort().sort(toSort)
-        assertContentEquals(longTestingList, toSort)
+        assertContentEquals(longTestingList, toSort, "quickSort fails with bigger array")
     }
 
     /*
@@ -33,7 +33,7 @@ class QuickSortTest : TestSorter() {
         val toSort = dupeTestingList.copyOf()
         toSort.shuffle()
         QuickSort().sort(toSort)
-        assertContentEquals(dupeTestingList, toSort)
+        assertContentEquals(dupeTestingList, toSort, "quickSort does not correctly sort duplicates")
     }
 
     /*
@@ -44,7 +44,7 @@ class QuickSortTest : TestSorter() {
         val toSort = emptyTestingList.copyOf()
         toSort.shuffle()
         QuickSort().sort(toSort)
-        assertContentEquals(emptyTestingList, toSort)
+        assertContentEquals(emptyTestingList, toSort, "quickSort changes empty array")
     }
 
     /*
@@ -61,6 +61,6 @@ class QuickSortTest : TestSorter() {
         }
 
         assertEquals(true, isUpdated)
-        assertContentEquals(basicTestingList, toSort)
+        assertContentEquals(basicTestingList, toSort, "onUpdate is not triggered upon swap")
     }
 }

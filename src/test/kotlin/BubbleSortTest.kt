@@ -11,7 +11,7 @@ class BubbleSortTest : TestSorter() {
         val toSort = basicTestingList.copyOf() //copyOf so original array cannot be touched
         toSort.shuffle()
         BubbleSort().sort(toSort)
-        assertContentEquals(basicTestingList, toSort)
+        assertContentEquals(basicTestingList, toSort, "bubbleSort does not correctly sort array")
     }
 
     /*
@@ -22,7 +22,7 @@ class BubbleSortTest : TestSorter() {
         val toSort = longTestingList.copyOf()
         toSort.shuffle()
         BubbleSort().sort(toSort)
-        assertContentEquals(longTestingList, toSort)
+        assertContentEquals(longTestingList, toSort, "bubbleSort fails with bigger array")
     }
 
     /*
@@ -33,7 +33,7 @@ class BubbleSortTest : TestSorter() {
         val toSort = dupeTestingList.copyOf()
         toSort.shuffle()
         BubbleSort().sort(toSort)
-        assertContentEquals(dupeTestingList, toSort)
+        assertContentEquals(dupeTestingList, toSort, "bubbleSort does not correctly sort duplicates")
     }
 
     /*
@@ -44,7 +44,7 @@ class BubbleSortTest : TestSorter() {
         val toSort = emptyTestingList.copyOf()
         toSort.shuffle()
         BubbleSort().sort(toSort)
-        assertContentEquals(emptyTestingList, toSort)
+        assertContentEquals(emptyTestingList, toSort, "bubbleSort changes empty array")
     }
 
     /*
@@ -60,7 +60,7 @@ class BubbleSortTest : TestSorter() {
             isUpdated = true //Sets to true if onUpdate is called at least once
         }
 
-        assertEquals(true, isUpdated)
+        assertEquals(true, isUpdated, "onUpdate is not triggered upon swap")
         assertContentEquals(basicTestingList, toSort)
     }
 }
